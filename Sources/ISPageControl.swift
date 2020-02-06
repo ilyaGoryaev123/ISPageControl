@@ -10,7 +10,7 @@ import UIKit
 
 open class ISPageControl: UIControl {
     fileprivate let limit = 5
-    var fullScaleIndex = [0, 1, 2]
+    open var fullScaleIndex = [0, 1, 2]
     fileprivate var dotLayers: [CALayer] = []
     fileprivate var diameter: CGFloat { radius * 2 }
     fileprivate var centerIndex: Int {
