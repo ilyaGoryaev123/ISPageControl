@@ -10,10 +10,15 @@ import UIKit
 
 open class ISPageControl: UIControl {
     fileprivate let limit = 5
-    fileprivate var fullScaleIndex = [0, 1, 2]
+    var fullScaleIndex = [0, 1, 2]
     fileprivate var dotLayers: [CALayer] = []
-    fileprivate var diameter: CGFloat { return radius * 2 }
-    fileprivate var centerIndex: Int { return fullScaleIndex[1] }
+    fileprivate var diameter: CGFloat { radius * 2 }
+    fileprivate var centerIndex: Int {
+        let count = fullScaleIndex.count
+        let index = (count > 1 ? count - 1 : count) / 2
+        return fullScaleIndex[index]
+    }
+    fileprivate var size: CGSize = .zero
     
     open var currentPage = 0 {
         didSet {
@@ -102,7 +107,7 @@ open class ISPageControl: UIControl {
     }
     
     override open var intrinsicContentSize: CGSize {
-        return sizeThatFits(CGSize.zero)
+        sizeThatFits(CGSize.zero)
     }
     
     override open func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -136,7 +141,7 @@ private extension ISPageControl {
             dotLayers.append(dotLayer)
         }
         
-        updateDotLayersLayout() // 이부분은 변경이 필요할듯
+        size = .zero
         setNeedsLayout()
         invalidateIntrinsicContentSize()
     }
@@ -148,6 +153,7 @@ private extension ISPageControl {
         var frame = CGRect(x: x, y: y, width: diameter, height: diameter)
         
         dotLayers.forEach {
+            $0.setAffineTransform(CGAffineTransform.identity)
             $0.cornerRadius = radius
             $0.frame = frame
             frame.origin.x += diameter + padding
@@ -192,21 +198,26 @@ private extension ISPageControl {
         dotLayers.enumerated().forEach() {
             $0.element.backgroundColor = $0.offset == currentPage ? currentPageTintColor.cgColor : inactiveTintColor.withAlphaComponent(inactiveTransparency).cgColor
         }
-        
+
+        if bounds.size != size {
+            updateDotLayersLayout()
+            size = bounds.size
+        }
+
         guard numberOfPages > limit else {
             return
         }
-        
+
         changeFullScaleIndexsIfNeeded()
         setupDotLayersPosition()
         setupDotLayersScale()
     }
-    
+
     func changeFullScaleIndexsIfNeeded() {
         guard !fullScaleIndex.contains(currentPage) else {
             return
         }
-        
+
         // TODO: Refactoring
         let moreThanBefore = (fullScaleIndex.last ?? 0) < currentPage
         if moreThanBefore {
