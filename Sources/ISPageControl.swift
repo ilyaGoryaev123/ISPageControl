@@ -220,14 +220,8 @@ private extension ISPageControl {
 
         // TODO: Refactoring
         let moreThanBefore = (fullScaleIndex.last ?? 0) < currentPage
-        if moreThanBefore {
-            fullScaleIndex[0] = currentPage - 2
-            fullScaleIndex[1] = currentPage - 1
-            fullScaleIndex[2] = currentPage
-        } else {
-            fullScaleIndex[0] = currentPage
-            fullScaleIndex[1] = currentPage + 1
-            fullScaleIndex[2] = currentPage + 2
+        for i in 0...(fullScaleIndex.count - 1) {
+            fullScaleIndex[i] = currentPage + i + (moreThanBefore ? (1 - fullScaleIndex.count) : 0)
         }
     }
 }
